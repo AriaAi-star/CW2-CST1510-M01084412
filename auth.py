@@ -1,62 +1,200 @@
-# %%
-
-# Load the bcrypt library, which is used for password hashing.
 import bcrypt
-
+import string
 import os
 
-# Create a function with a parameter ‘password’ of type string.
+USER_DATA_FILE = "users.txt"
 
 
-
-def hash_password (plain_password_text):
-
-# Convert the password from a plain text string into a bytes field because bcrypt can only handle bytes-like objects.
-
+# -----------------------------
+# Password Hashing (bcrypt only)
+# -----------------------------
+def hash_password(plain_password_text):
     byted_password = plain_password_text.encode('utf-8')
-
-# Generate a salt value randomly so as to add an extra level of security against a "rainbow table" attack.
-
     salt = bcrypt.gensalt()
-
-# Hash the password with the salt value using the bcrypt hashing algorithm.
-
-    final_hashed_password = bcrypt.hashpw (byted_password,salt)
-
-# Convert the hashed password bytes into a UTF-8 string 
-
+    final_hashed_password = bcrypt.hashpw(byted_password, salt)
     return final_hashed_password.decode('utf-8')
 
-# the bellow code is for test and there is no need to this 
-#if __name__ == "__main__":
-     #print(hash_password("Aria@1382"))
 
-# %%
-
-
-def password_verification (plain_password_text,final_hashed_password):
-
+def password_verification(plain_password_text, final_hashed_password):
     byted_password = plain_password_text.encode('utf-8')
-
     final_hashed_password = final_hashed_password.encode('utf-8')
-
-    return bcrypt.checkpw(byted_password,final_hashed_password)
-
-# the bellow code is just for testing 
-
-'''
-test_password = "Aria@1382"
-hashed = hash_password(test_password)
-print(f"Original password: {test_password}")
-print(f"Hashed password: {hashed}")
-print(f"Hash length: {len(hashed)} characters")
-is_valid = password_verification(test_password, hashed)
-print(f"\nVerification with correct password: {is_valid}")
-is_invalid = password_verification("WrongPassword", hashed)
-print(f"Verification with incorrect password: {is_invalid}")
-'''
+    return bcrypt.checkpw(byted_password, final_hashed_password)
 
 
+# -----------------------------
+# User Registration
+# -----------------------------
+def register_user(username, password):
+    hashed_password = hash_password(password)
+    with open(USER_DATA_FILE, "a") as f:
+        f.write(f"{username},{hashed_password}\n")
+    print(f"User '{username}' registered.")
 
 
-# %%
+# -----------------------------
+# Check if Username Exists
+# -----------------------------
+def user_exists(username):
+    try:
+        with open(USER_DATA_FILE, "r") as file:
+            for line in file:
+                stored_username, _ = line.strip().split(",", 1)
+                if stored_username == username:
+                    return True
+    except FileNotFoundError:
+        return False
+    return False
+
+
+# -----------------------------
+# Login (bcrypt verification)
+# -----------------------------
+def login_user(username, password):
+    try:
+        with open(USER_DATA_FILE, "r") as file:
+            for line in file:
+                stored_username, stored_hash = line.strip().split(",", 1)
+                if stored_username == username:
+                    return password_verification(password, stored_hash)
+    except FileNotFoundError:
+        return False
+    return False
+
+
+# -----------------------------
+# Password Requirements Display
+# -----------------------------
+def check_password(password):
+    has_upper = any(ch.isupper() for ch in password)
+    has_lower = any(ch.islower() for ch in password)
+    has_digit = any(ch.isdigit() for ch in password)
+    has_space = any(ch.isspace() for ch in password)
+    has_special = any(ch in string.punctuation for ch in password)
+
+    if has_upper:
+        print("✓ Your password has an uppercase letter.")
+    else:
+        print("✗ Your password does NOT have an uppercase letter.")
+
+    if has_lower:
+        print("✓ Your password has a lowercase letter.")
+    else:
+        print("✗ Your password does NOT have a lowercase letter.")
+
+    if has_digit:
+        print("✓ Your password has a digit.")
+    else:
+        print("✗ Your password does NOT have any digits.")
+
+    if has_special:
+        print("✓ Your password has a special character.")
+    else:
+        print("✗ Your password does NOT have a special character.")
+
+    if has_space:
+        print("⚠ Your password contains spaces. Please remove them.")
+    else:
+        print("✓ Your password does not contain spaces.")
+
+
+# -----------------------------
+# Username & Password Validation
+# -----------------------------
+def validate_username(username):
+    import re
+    if len(username) < 3:
+        return False, "Username must be at least 3 characters long."
+    if not username[0].isalpha():
+        return False, "Username must start with a letter."
+    if not re.match(r"^[A-Za-z][A-Za-z0-9_]*$", username):
+        return False, "Username can only contain letters, digits, and underscores."
+    if user_exists(username):
+        return False, "This username is already taken."
+    return True, ""
+
+
+def validate_password(password):
+    import re
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long."
+    if not re.search(r'[a-z]', password):
+        return False, "Password must contain a lowercase letter."
+    if not re.search(r'[A-Z]', password):
+        return False, "Password must contain an uppercase letter."
+    if not re.search(r'[0-9]', password):
+        return False, "Password must contain a digit."
+    if not re.search(r'[\W_]', password):
+        return False, "Password must contain a special character."
+    if " " in password:
+        return False, "Password must not contain spaces."
+    return True, ""
+
+
+# -----------------------------
+# Menu System
+# -----------------------------
+def display_menu():
+    print("\n" + "=" * 50)
+    print(" MULTI-DOMAIN INTELLIGENCE PLATFORM")
+    print(" Secure Authentication System")
+    print("=" * 50)
+    print("\n[1] Register a new user")
+    print("[2] Login")
+    print("[3] Exit")
+    print("-" * 50)
+
+
+def main():
+    print("\nWelcome to the Week 7 Authentication System!")
+
+    while True:
+        display_menu()
+        choice = input("\nPlease select an option (1-3): ").strip()
+
+        if choice == '1':
+            print("\n--- USER REGISTRATION ---")
+            username = input("Enter a username: ").strip()
+
+            # Username validation
+            is_valid, msg = validate_username(username)
+            if not is_valid:
+                print("Error:", msg)
+                continue
+
+            password = input("Enter a password: ").strip()
+
+            # Password validation
+            is_valid, msg = validate_password(password)
+            if not is_valid:
+                print("Error:", msg)
+                continue
+
+            password_confirm = input("Confirm password: ").strip()
+            if password != password_confirm:
+                print("Error: Passwords do not match.")
+                continue
+
+            register_user(username, password)
+            print("\nUser registered successfully.")
+
+        elif choice == '2':
+            print("\n--- USER LOGIN ---")
+            username = input("Enter your username: ").strip()
+            password = input("Enter your password: ").strip()
+
+            if login_user(username, password):
+                print("\nYou are now logged in.")
+                input("Press Enter to return to the main menu...")
+            else:
+                print("\nError: Invalid username or password.")
+
+        elif choice == '3':
+            print("\nThank you for using the authentication system. Exiting...")
+            break
+
+        else:
+            print("\nError: Invalid option. Please select 1, 2, or 3.")
+
+
+if __name__ == "__main__":
+    main()
