@@ -1,3 +1,7 @@
+
+# instructor
+
+'''
 import bcrypt
 
 def hash_password(plain_text_password):
@@ -47,3 +51,4 @@ def login_user(username, password):
                 return verify_password(password, hash)
     
     return False
+'''
