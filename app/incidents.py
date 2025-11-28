@@ -31,3 +31,15 @@ def get_all_incidents():
     )
     conn.close()
     return df
+
+
+def delete_incident(conn, incident_id):
+    """
+    Delete an incident from the database.
+    
+    TODO: Implement DELETE operation.
+    """
+    # TODO: Write DELETE SQL: DELETE FROM cyber_incidents WHERE id = ?
+    # TODO: Execute and commit
+    # TODO: Return cursor.rowcount
+    pass
