@@ -1,7 +1,3 @@
-
-# -----------------------------
-# Password Hashing (bcrypt only)
-# -----------------------------
 def hash_password(plain_password_text):
     byted_password = plain_password_text.encode('utf-8')
     salt = bcrypt.gensalt()
@@ -23,7 +19,6 @@ def register_user(username, password):
     with open(USER_DATA_FILE, "a") as f:
         f.write(f"{username},{hashed_password}\n")
     print(f"User '{username}' registered.")
-
 
 # -----------------------------
 # Check if Username Exists
@@ -122,4 +117,3 @@ def validate_password(password):
     if " " in password:
         return False, "Password must not contain spaces."
     return True, ""
-
