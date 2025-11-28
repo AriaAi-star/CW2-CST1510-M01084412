@@ -70,3 +70,36 @@ Traceback (most recent call last):
   File "/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/Home.py", line 2, in <module>
     from app.metadata import get_all_datasets_metadata
 ImportError: cannot import name 'get_all_datasets_metadata' from 'app.metadata' (/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/app/metadata.py)
+2025-11-28 13:44:12.884 Uncaught app execution
+Traceback (most recent call last):
+  File "/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/.venv311/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/.venv311/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 669, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/Home.py", line 2, in <module>
+    from app.metadata import get_all_datasets_metadata
+ImportError: cannot import name 'get_all_datasets_metadata' from 'app.metadata' (/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/app/metadata.py)
+2025-11-28 13:44:59.445 Uncaught app execution
+Traceback (most recent call last):
+  File "/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/.venv311/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/.venv311/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 669, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/Home.py", line 2, in <module>
+    from app.metadata import get_all_datasets_metadata
+ImportError: cannot import name 'get_all_datasets_metadata' from 'app.metadata' (/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/app/metadata.py)
+2025-11-28 13:45:10.935 Uncaught app execution
+Traceback (most recent call last):
+  File "/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/.venv311/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/.venv311/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 669, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/Home.py", line 2, in <module>
+    from app.metadata import get_all_datasets_metadata
+ImportError: cannot import name 'get_all_datasets_metadata' from 'app.metadata' (/Users/aria/Desktop/CW2- CST 1510/CW2-CST1510-M01084412/app/metadata.py)

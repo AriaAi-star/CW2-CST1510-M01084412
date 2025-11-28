@@ -31,12 +31,12 @@ with st.sidebar:
 col1 , col2 = st.columns(2)
 
 with col1:
-    st.subheader("1st chart")
-    st.bar_chart(x='name', y='rows', data=data)
+    st.subheader("Dataset Rows")
+    st.bar_chart(data.set_index('name')['rows'])
 
 with col2:
-    st.subheader("2nd chart")
-    st.line_chart(x='uploaded_by', y='columns', data=data)
+    st.subheader("Dataset Columns")
+    st.bar_chart(data.set_index('name')['columns'])
 
 
 with st.expander("Show raw data"):
