@@ -1,4 +1,16 @@
+"""User management module.
+
+Provides password hashing, validation, and user authentication utilities.
+"""
+
+import bcrypt
+import re
+import sqlite3
+from pathlib import Path
+
+
 def hash_password(plain_password_text):
+    """Hash a plain text password using bcrypt."""
     byted_password = plain_password_text.encode('utf-8')
     salt = bcrypt.gensalt()
     final_hashed_password = bcrypt.hashpw(byted_password, salt)
@@ -6,59 +18,47 @@ def hash_password(plain_password_text):
 
 
 def password_verification(plain_password_text, final_hashed_password):
+    """Verify a plain text password against a bcrypt hash."""
     byted_password = plain_password_text.encode('utf-8')
     final_hashed_password = final_hashed_password.encode('utf-8')
     return bcrypt.checkpw(byted_password, final_hashed_password)
 
 
-# -----------------------------
-# User Registration
-# -----------------------------
-def register_user(username, password):
-    hashed_password = hash_password(password)
-    with open(USER_DATA_FILE, "a") as f:
-        f.write(f"{username},{hashed_password}\n")
-    print(f"User '{username}' registered.")
-
-# -----------------------------
-# Check if Username Exists
-# -----------------------------
-def user_exists(username):
-    try:
-        with open(USER_DATA_FILE, "r") as file:
-            for line in file:
-                stored_username, _ = line.strip().split(",", 1)
-                if stored_username == username:
-                    return True
-    except FileNotFoundError:
-        return False
-    return False
+def validate_username(username):
+    """Validate username format."""
+    if len(username) < 3:
+        return False, "Username must be at least 3 characters long."
+    if not username[0].isalpha():
+        return False, "Username must start with a letter."
+    if not re.match(r"^[A-Za-z][A-Za-z0-9_]*$", username):
+        return False, "Username can only contain letters, digits, and underscores."
+    return True, ""
 
 
-# -----------------------------
-# Login (bcrypt verification)
-# -----------------------------
-def login_user(username, password):
-    try:
-        with open(USER_DATA_FILE, "r") as file:
-            for line in file:
-                stored_username, stored_hash = line.strip().split(",", 1)
-                if stored_username == username:
-                    return password_verification(password, stored_hash)
-    except FileNotFoundError:
-        return False
-    return False
+def validate_password(password):
+    """Validate password strength requirements."""
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long."
+    if not re.search(r'[a-z]', password):
+        return False, "Password must contain a lowercase letter."
+    if not re.search(r'[A-Z]', password):
+        return False, "Password must contain an uppercase letter."
+    if not re.search(r'[0-9]', password):
+        return False, "Password must contain a digit."
+    if not re.search(r'[\W_]', password):
+        return False, "Password must contain a special character."
+    if " " in password:
+        return False, "Password must not contain spaces."
+    return True, ""
 
 
-# -----------------------------
-# Password Requirements Display
-# -----------------------------
 def check_password(password):
+    """Display password strength feedback."""
     has_upper = any(ch.isupper() for ch in password)
     has_lower = any(ch.islower() for ch in password)
     has_digit = any(ch.isdigit() for ch in password)
     has_space = any(ch.isspace() for ch in password)
-    has_special = any(ch in string.punctuation for ch in password)
+    has_special = any(ch in "!@#$%^&*()_+-=[]{}|;:',.<>?/\\~`" for ch in password)
 
     if has_upper:
         print("✓ Your password has an uppercase letter.")
@@ -86,34 +86,48 @@ def check_password(password):
         print("✓ Your password does not contain spaces.")
 
 
-# -----------------------------
-# Username & Password Validation
-# -----------------------------
-def validate_username(username):
-    import re
-    if len(username) < 3:
-        return False, "Username must be at least 3 characters long."
-    if not username[0].isalpha():
-        return False, "Username must start with a letter."
-    if not re.match(r"^[A-Za-z][A-Za-z0-9_]*$", username):
-        return False, "Username can only contain letters, digits, and underscores."
-    if user_exists(username):
-        return False, "This username is already taken."
-    return True, ""
-
-
-def validate_password(password):
-    import re
-    if len(password) < 8:
-        return False, "Password must be at least 8 characters long."
-    if not re.search(r'[a-z]', password):
-        return False, "Password must contain a lowercase letter."
-    if not re.search(r'[A-Z]', password):
-        return False, "Password must contain an uppercase letter."
-    if not re.search(r'[0-9]', password):
-        return False, "Password must contain a digit."
-    if not re.search(r'[\W_]', password):
-        return False, "Password must contain a special character."
-    if " " in password:
-        return False, "Password must not contain spaces."
-    return True, ""
+def migrate_users_from_file(conn, filepath=None):
+    """Migrate users from users.txt file to database.
+    
+    Args:
+        conn: Database connection
+        filepath: Path to users.txt file (defaults to DATA/users.txt)
+    """
+    if filepath is None:
+        filepath = Path("DATA/users.txt")
+    else:
+        filepath = Path(filepath)
+    
+    if not filepath.exists():
+        print(f"⚠️  File not found: {filepath}")
+        print("   No users to migrate.")
+        return
+    
+    cursor = conn.cursor()
+    migrated_count = 0
+    
+    with open(filepath, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            
+            # Parse line: username,password_hash
+            parts = line.split(',')
+            if len(parts) >= 2:
+                username = parts[0]
+                password_hash = parts[1]
+                
+                # Insert user (ignore if already exists)
+                try:
+                    cursor.execute(
+                        "INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)",
+                        (username, password_hash, 'user')
+                    )
+                    if cursor.rowcount > 0:
+                        migrated_count += 1
+                except sqlite3.Error as e:
+                    print(f"Error migrating user {username}: {e}")
+    
+    conn.commit()
+    print(f"✅ Migrated {migrated_count} users from {filepath.name}")
