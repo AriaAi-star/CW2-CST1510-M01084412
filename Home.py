@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+from app.users import hash_password, password_verification
 
 st.set_page_config(page_title="My App", page_icon="🔐")
 
@@ -15,14 +16,15 @@ def load_users():
             for line in f:
                 line = line.strip()
                 if ',' in line:
-                    username, password = line.split(',', 1)
-                    users[username] = password
+                    username, password_hash = line.split(',', 1)
+                    users[username] = password_hash
     return users
 
-# Save user to file
+# Save user to file with hashed password
 def save_user(username, password):
+    hashed = hash_password(password)
     with open(USER_FILE, 'a') as f:
-        f.write(f"{username},{password}\n")
+        f.write(f"{username},{hashed}\n")
 
 # Initialize session state
 if "logged_in" not in st.session_state:
@@ -42,11 +44,15 @@ if not st.session_state.logged_in:
         password = st.text_input("Password", type="password", key="login_pass")
         
         if st.button("Login"):
-            if username in st.session_state.users and st.session_state.users[username] == password:
-                st.session_state.logged_in = True
-                st.session_state.username = username
-                st.success("Login successful!")
-                st.rerun()
+            if username in st.session_state.users:
+                stored_hash = st.session_state.users[username]
+                if password_verification(password, stored_hash):
+                    st.session_state.logged_in = True
+                    st.session_state.username = username
+                    st.success("Login successful!")
+                    st.rerun()
+                else:
+                    st.error("Invalid username or password")
             else:
                 st.error("Invalid username or password")
     
@@ -62,9 +68,10 @@ if not st.session_state.logged_in:
             elif new_pass != confirm_pass:
                 st.error("Passwords don't match")
             elif new_user and new_pass:
-                st.session_state.users[new_user] = new_pass
-                save_user(new_user, new_pass)  # Save to file
-                st.success("Registration successful! Please login.")
+                hashed = hash_password(new_pass)
+                st.session_state.users[new_user] = hashed
+                save_user(new_user, new_pass)  # Save to file (will be hashed inside)
+                st.success("✅ Registration successful! Password hashed with bcrypt + salt. Please login.")
             else:
                 st.warning("Please fill all fields")
 
