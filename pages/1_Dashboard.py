@@ -20,20 +20,33 @@ with st.sidebar:
             )
             st.success(response.choices[0].message.content)
 
-st.title("📊 Dashboard")
-st.write("This is Page 1")
+import pandas as pd
+from app.incidents import get_all_incidents
 
-st.info("Files in `pages/` folder become additional pages")
+st.title("📊 Cyber Incidents Dashboard")
 
-# Simple content
-st.subheader("Quick Stats")
-col1, col2, col3 = st.columns(3)
+# Load real data
+incidents_df = get_all_incidents()
+
+# Real Stats
+st.subheader("📈 Real-Time Statistics")
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.metric("Users", "150")
+    st.metric("Total Incidents", len(incidents_df))
 
 with col2:
-    st.metric("Sales", "$12,345")
+    critical = len(incidents_df[incidents_df['severity'] == 'Critical'])
+    st.metric("Critical", critical, delta=f"{critical} urgent")
 
 with col3:
-    st.metric("Growth", "23%", delta="5%")
+    open_incidents = len(incidents_df[incidents_df['status'] == 'Open'])
+    st.metric("Open", open_incidents)
+
+with col4:
+    resolved = len(incidents_df[incidents_df['status'] == 'Resolved'])
+    st.metric("Resolved", resolved)
+
+# Show recent incidents
+st.subheader("🔴 Recent Incidents")
+st.dataframe(incidents_df.head(10), use_container_width=True)

@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import plotly.express as px
 from openai import OpenAI
 
 # 🔒 Protected Page - Require Login
@@ -22,29 +23,30 @@ with st.sidebar:
             )
             st.success(response.choices[0].message.content)
 
-st.title("📈 Analytics")
-st.write("This is Page 2")
+from app.incidents import get_all_incidents
 
-# 1. Pie Chart (Circle Chart)
-st.subheader("📊 Sales Distribution")
-pie_data = pd.DataFrame({
-    'Category': ['Product A', 'Product B', 'Product C', 'Product D'],
-    'Value': [30, 25, 20, 25]
-})
-import plotly.express as px
-fig_pie = px.pie(pie_data, values='Value', names='Category', title='Market Share')
+st.title("📈 Incident Analytics")
+
+# Load real data
+incidents_df = get_all_incidents()
+
+# 1. Severity Distribution (Pie Chart)
+st.subheader("📊 Incidents by Severity")
+severity_counts = incidents_df['severity'].value_counts()
+fig_pie = px.pie(
+    values=severity_counts.values, 
+    names=severity_counts.index, 
+    title='Severity Distribution'
+)
 st.plotly_chart(fig_pie)
 
-# 2. Bar + Line Chart
-st.subheader("📈 Revenue & Growth")
-months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
-revenue = [45, 52, 48, 65, 70, 68]
-growth = [10, 15, -8, 35, 8, -3]
-
-fig = px.bar(x=months, y=revenue, labels={'x': 'Month', 'y': 'Revenue ($K)'})
-fig.add_scatter(x=months, y=growth, name='Growth (%)', yaxis='y2', mode='lines+markers')
-fig.update_layout(
-    yaxis2=dict(overlaying='y', side='right', title='Growth (%)'),
-    showlegend=True
+# 2. Category Distribution (Bar Chart)
+st.subheader("📈 Incidents by Category")
+category_counts = incidents_df['category'].value_counts()
+fig_bar = px.bar(
+    x=category_counts.index, 
+    y=category_counts.values,
+    labels={'x': 'Category', 'y': 'Count'},
+    title='Incident Categories'
 )
-st.plotly_chart(fig)
+st.plotly_chart(fig_bar)

@@ -58,22 +58,74 @@ if not st.session_state.logged_in:
     
     # Register tab
     with tab2:
+        import string
+        
         new_user = st.text_input("Username", key="reg_user")
         new_pass = st.text_input("Password", type="password", key="reg_pass")
         confirm_pass = st.text_input("Confirm Password", type="password", key="reg_confirm")
         
         if st.button("Register"):
+            # Check if username exists
             if new_user in st.session_state.users:
                 st.error("Username already exists")
             elif new_pass != confirm_pass:
                 st.error("Passwords don't match")
-            elif new_user and new_pass:
-                hashed = hash_password(new_pass)
-                st.session_state.users[new_user] = hashed
-                save_user(new_user, new_pass)  # Save to file (will be hashed inside)
-                st.success("✅ Registration successful! Password hashed with bcrypt + salt. Please login.")
-            else:
+            elif not new_user or not new_pass:
                 st.warning("Please fill all fields")
+            else:
+                # Password validation
+                errors = []
+                
+                # Check length
+                if len(new_pass) <= 8:
+                    errors.append("❌ Password must be more than 8 characters")
+                else:
+                    st.success("✅ Good job! Your password has required minimum length")
+                
+                # Check uppercase
+                has_upper = any(c.isupper() for c in new_pass)
+                if has_upper:
+                    st.success("✅ Nice! Your password has uppercase letter")
+                else:
+                    errors.append("❌ Your password doesn't have uppercase")
+                
+                # Check lowercase
+                has_lower = any(c.islower() for c in new_pass)
+                if has_lower:
+                    st.success("✅ Nice! Your password has lowercase letter")
+                else:
+                    errors.append("❌ Your password doesn't have lowercase")
+                
+                # Check digit
+                has_digit = any(c.isdigit() for c in new_pass)
+                if has_digit:
+                    st.success("✅ Nice! Your password has digit")
+                else:
+                    errors.append("❌ Your password doesn't have digit")
+                
+                # Check space
+                has_space = any(c.isspace() for c in new_pass)
+                if has_space:
+                    errors.append("❌ Your password has space. Please remove it")
+                else:
+                    st.success("✅ Nice! Your password doesn't have space")
+                
+                # Check special character
+                has_special = any(c in string.punctuation for c in new_pass)
+                if has_special:
+                    st.success("✅ Nice! Your password has special character")
+                else:
+                    errors.append("❌ Your password doesn't have special character")
+                
+                # If all validations pass
+                if not errors:
+                    hashed = hash_password(new_pass)
+                    st.session_state.users[new_user] = hashed
+                    save_user(new_user, new_pass)
+                    st.success("🎉 Registration successful! Password is secure and hashed. Please login.")
+                else:
+                    for error in errors:
+                        st.error(error)
 
 # Logged in view
 else:
@@ -90,4 +142,4 @@ else:
     if st.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = ""
-        st.rerun()
+        st.rerun() 
