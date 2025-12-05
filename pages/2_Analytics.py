@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 from openai import OpenAI
+import os
 
 # 🔒 Protected Page - Require Login
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
@@ -16,7 +17,7 @@ with st.sidebar:
     user_msg = st.text_input("Ask me anything:")
     if st.button("Send") and user_msg:
         with st.spinner("Thinking..."):
-            client = OpenAI(api_key="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")
+            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[{"role": "user", "content": user_msg}]

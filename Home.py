@@ -1,6 +1,10 @@
 import streamlit as st
 import os
+from dotenv import load_dotenv
 from app.users import hash_password, password_verification
+
+# Load environment variables
+load_dotenv()
 
 st.set_page_config(
     page_title="Security Platform Login", 
