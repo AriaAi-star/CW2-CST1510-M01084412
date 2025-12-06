@@ -1,17 +1,23 @@
+#aim of this file is to connect our code to sqlite database
+
+
+
+#sqlite is a python library to work with databases 
 import sqlite3
 from pathlib import Path
 
 
+
+#we are using path to manage file paths
 DB_PATH = Path(__file__).resolve().parents[1] / 'DATA' / 'inteligent_platform.db'
 
 
 def connect_database():
 	"""Return a new SQLite connection to the project database."""
-	# Ensure parent directory exists and use the repository DATA path
+	#Use the repository DATA path and make sure the parent directory is present.
 	return sqlite3.connect(str(DB_PATH))
 
-
-# Backwards-compatible global connection (kept for scripts that import `conn`)
+#global connection 
 try:
 	conn = connect_database()
 except Exception:
