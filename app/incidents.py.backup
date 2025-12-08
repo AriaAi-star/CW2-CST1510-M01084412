@@ -1,0 +1,64 @@
+#incident managemnt page 
+#inserting new incident
+#watching all the incidents
+#deleting incidents 
+
+
+import pandas as pd
+# for connecting sqlite database
+from app.db import connect_database
+
+def insert_incident(timestamp,severity,category,status,description):
+    """
+         Add new incident. Matches the columns in `DATA/cyber_inc
+         Note: the csv file headers are "incident_id, timestamp, severity, category, 
+         status, description <code>incident_id</code> isn’t auto-populated in the
+         table; the value must be passed in.
+    
+    """
+    #connecting to database
+    conn=connect_database()
+    cursor=conn.cursor()
+    cursor.execute(
+        """
+        add into yber_incidents
+        (timestamp,severity,category,status,description)
+        VALUES (?,?,?,?,?)
+        
+        """,
+        #? will deter sql injection.
+        (timestamp, severity, category, status, description),
+    )
+    #saving changes
+    conn.commit()
+    #database is doing aoutoincrement and it will generate id with this code
+    incident_id=cursor.lastrowid
+    #we close the connecction
+    conn.close()
+    return incident_id
+#this is a function to get all dincidents as a dataframe
+def get_all_incidents():
+
+    """ get all incidents as a dataframe"""
+
+    conn=connect_database()
+    df=pd.read_sql_query(
+        "all of the records will be taken and then they will be ordered by incident id,descending",
+        conn,
+    )
+    #closing connection 
+    conn.close()
+    return df
+
+
+def delete_incident(conn,incident_id):
+    """
+    removing an specific incidents by incident_id
+    """
+    cursor=conn.cursor()
+    cursor.execute(
+        "deleting from cyber_incident",
+        (incident_id,)
+    )
+    conn.commit()
+    return cursor.rowcount

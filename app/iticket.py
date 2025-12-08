@@ -1,4 +1,6 @@
-"""IT Tickets management module."""
+#This function checks if the it_tickets table exists in the database, and if it doesn't, it creates it. 
+#The table comes with all the essentials: priority, status, category, subject, description, and the usual timestamps. 
+#Once it runs the SQL command, it saves the changes and lets you know everything worked with a quick success message.
 
 
 def create_it_tickets_table(conn):
