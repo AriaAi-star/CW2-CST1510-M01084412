@@ -11,8 +11,8 @@ st.set_page_config(
     page_icon="🔐",
     layout="centered"
 )
+#decleration: this is a prepared coede which i custtomizes it for style.
 
-# Custom CSS for beautiful styling
 st.markdown("""
 <style>
     .main {
@@ -82,9 +82,15 @@ st.markdown("""
 
 st.markdown("<h1>🔐 Cyber Security Platform</h1>", unsafe_allow_html=True)
 
-USER_FILE = "DATA/user.txt"
+#this is our file for defining users which is available in DATA folder
+USER_FILE="DATA/user.txt"
 
-# Load users from file
+#Load users from file
+#this functiom is building an empty dictionary for users
+#check the user.txt file if our file exist
+#if exist:
+#it will remove the spaces with strip 
+#at the end it will return list of users and passwords in a hashed ways
 def load_users():
     users = {}
     if os.path.exists(USER_FILE):
@@ -92,8 +98,8 @@ def load_users():
             for line in f:
                 line = line.strip()
                 if ',' in line:
-                    username, password_hash = line.split(',', 1)
-                    users[username] = password_hash
+                    username, password_hash=line.split(',', 1)
+                    users[username]=password_hash
     return users
 
 # Save user to file with hashed password
@@ -102,17 +108,20 @@ def save_user(username, password):
     with open(USER_FILE, 'a') as f:
         f.write(f"{username},{hashed}\n")
 
-# Initialize session state
+
+#Initialize session state
+#for keeping login during the session
+#we define it as false so the user need to login firts
 if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+    st.session_state.logged_in=False
 if "username" not in st.session_state:
     st.session_state.username = ""
 if "users" not in st.session_state:
     st.session_state.users = load_users()
 
-# Not logged in - show login/register
+# Not logged in-show login/register
 if not st.session_state.logged_in:
-    # Add a welcome message
+    
     st.markdown("""
     <div style='text-align: center; color: white; padding: 20px;'>
         <h3 style='color: white;'>Welcome to the Intelligent Security Platform</h3>
@@ -126,14 +135,14 @@ if not st.session_state.logged_in:
     with col2:
         st.markdown("<div class='login-container'>", unsafe_allow_html=True)
         
-        tab1, tab2 = st.tabs(["🔑 Login", "📝 Register"])
+        tab1, tab2 = st.tabs(["🔑 Login","📝 Register"])
         
-        # Login tab
+        # login page
         with tab1:
-            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("<br>",unsafe_allow_html=True)
             st.markdown("#### Sign in to your account")
-            username = st.text_input("👤 Username", key="login_user", placeholder="Enter your username")
-            password = st.text_input("🔒 Password", type="password", key="login_pass", placeholder="Enter your password")
+            username = st.text_input("👤 Username",key="login_user", placeholder="Enter your username")
+            password = st.text_input("🔒 Password",type="password", key="login_pass", placeholder="Enter your password")
             
             st.markdown("<br>", unsafe_allow_html=True)
             
@@ -156,11 +165,12 @@ if not st.session_state.logged_in:
             
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("#### Create new account")
-            new_user = st.text_input("👤 Username", key="reg_user", placeholder="Choose a username")
-            new_pass = st.text_input("🔒 Password", type="password", key="reg_pass", placeholder="Create a strong password")
-            confirm_pass = st.text_input("🔒 Confirm Password", type="password", key="reg_confirm", placeholder="Re-enter your password")
+            # text inpute - one for username - one for password
+            new_user=st.text_input("👤 Username", key="reg_user", placeholder="Choose a username")
+            new_pass=st.text_input("🔒 Password", type="password", key="reg_pass", placeholder="Create a strong password")
+            confirm_pass=st.text_input("🔒 Confirm Password", type="password", key="reg_confirm", placeholder="Re-enter your password")
             
-            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("<br>",unsafe_allow_html=True)
             
             if st.button("✨ Create Account"):
                 # Check if username exists
@@ -240,7 +250,7 @@ else:
     
     # Stats cards
     col1, col2, col3 = st.columns(3)
-    
+ # tree small cards for ui   
     with col1:
         st.markdown("""
         <div class='metric-card' style='text-align: center;'>

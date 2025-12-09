@@ -25,7 +25,7 @@ with st.sidebar:
 st.markdown("""
 <style>
     .contact-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #000000 0%, #333333 100%);
         padding: 40px;
         border-radius: 15px;
         color: white;
@@ -67,18 +67,17 @@ with col1:
     # Display your photo (rotated 90 degrees clockwise)
     from PIL import Image
     img = Image.open("photo1.jpeg")
-    img_rotated = img.rotate(-90, expand=True)  # -90 = 90 degrees clockwise
+    img_rotated = img.rotate(-90,expand=True)  # -90 = 90 degrees clockwise. #i donnt know why but the photo neede rotation
     st.image(img_rotated, use_container_width=True, caption="Aria - Developer")
 
 with col2:
     st.markdown("""
     <div class='info-card'>
-        <h3 style='color: #667eea; margin-top: 0;'>Aria - Platform Developer</h3>
-        <p><strong>Student ID:</strong> M01084412</p>
-        <p><strong>Email:</strong> Ak2832@live.mdx.ac.uk</p>
-        <p><strong>Institution:</strong> Middlesex University London</p>
+        <h3 style='color: #000000; margin-top: 0;'>Aria - Platform Developer</h3>
+        <p><strong style='color: #000000;'>Email:</strong> <span style='color: #000000;'>Ak2832@live.mdx.ac.uk</span></p>
+        <p><strong style='color: #000000;'>Institution:</strong> <span style='color: #000000;'>Middlesex University London</span></p>
         <hr>
-        <p style='margin-bottom: 0;'>
+        <p style='margin-bottom: 0; color: #000000;'>
         This cybersecurity incident management platform was developed as part of the 
         CST 1510 coursework. The system provides comprehensive tools for monitoring, 
         analyzing, and managing security incidents with real-time data visualization 
@@ -97,30 +96,30 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown("""
     <div class='info-card' style='text-align: center;'>
-        <h3 style='color: #667eea; margin: 0;'>📧</h3>
+        <h3 style='color: #000000; margin: 0;'>📧</h3>
         <h4 style='margin: 10px 0 5px 0;'>Email</h4>
-        <p style='margin: 0; color: #666;'>Ak2832@live.mdx.ac.uk</p>
-        <p style='margin: 5px 0 0 0; color: #666;'>Ak2832@live.mdx.ac.uk</p>
+        <p style='margin: 0; color: #000000;'>Ak2832@live.mdx.ac.uk</p>
+        <p style='margin: 5px 0 0 0; color: #000000;'>Ak2832@live.mdx.ac.uk</p>
     </div>
     """, unsafe_allow_html=True)
 
 with col2:
     st.markdown("""
     <div class='info-card' style='text-align: center;'>
-        <h3 style='color: #667eea; margin: 0;'>📱</h3>
+        <h3 style='color: #000000; margin: 0;'>📱</h3>
         <h4 style='margin: 10px 0 5px 0;'>Phone</h4>
-        <p style='margin: 0; color: #666;'>+44731009886</p>
-        <p style='margin: 5px 0 0 0; color: #666;'>Mon-Fri: 9AM - 6PM</p>
+        <p style='margin: 0; color: #000000;'>+44731009886</p>
+        <p style='margin: 5px 0 0 0; color: #000000;'>Mon-Fri: 9AM - 6PM</p>
     </div>
     """, unsafe_allow_html=True)
 
 with col3:
     st.markdown("""
     <div class='info-card' style='text-align: center;'>
-        <h3 style='color: #667eea; margin: 0;'>📍</h3>
+        <h3 style='color: #000000; margin: 0;'>📍</h3>
         <h4 style='margin: 10px 0 5px 0;'>Office</h4>
-        <p style='margin: 0; color: #666;'>NW9 5JA</p>
-        <p style='margin: 5px 0 0 0; color: #666;'>London, UK</p>
+        <p style='margin: 0; color: #000000;'>NW9 5JA</p>
+        <p style='margin: 5px 0 0 0; color: #000000;'>London, UK</p>
     </div>
     """, unsafe_allow_html=True)
 
