@@ -30,42 +30,40 @@ from app.incidents import get_all_incidents
 # Page Config
 st.title("📊 Cyber Security Dashboard")
 
-st.markdown("🔍 Incident Records Overview")
+# Dashboard Customization Controls
+st.markdown("### ⚙️ Customize Your Dashboard")
+
+view_limit=st.selectbox(
+    "👁️ Show Records",
+    options=[10, 25, 50, 100, 'All'],
+    index=0,
+    help="Number of incidents to display"
+)
+
 st.markdown("---")
 
 # Load real data
-incidents_df = get_all_incidents()
-
-# Apply filters
-filtered_df = incidents_df.copy()
-
-if severity_filter:
-    filtered_df = filtered_df[filtered_df['severity'].isin(severity_filter)]
-
-if status_filter:
-    filtered_df = filtered_df[filtered_df['status'].isin(status_filter)]
-
-if category_filter:
-    filtered_df = filtered_df[filtered_df['category'].isin(category_filter)]
-
-# Show filter results
-if len(filtered_df) < len(incidents_df):
-    st.info(f"📌 Showing **{len(filtered_df)}** of **{len(incidents_df)}** incidents based on your filters")
+incidents_df=get_all_incidents()
+filtered_df=incidents_df.copy()
 
 # Executive Summary
 st.markdown("### 📋 Executive Summary")
-total = len(filtered_df)
-critical = len(filtered_df[filtered_df['severity'] == 'Critical'])
-open_incidents = len(filtered_df[filtered_df['status'] == 'Open'])
-resolved = len(filtered_df[filtered_df['status'] == 'Resolved'])
-resolution_rate = (resolved / total * 100) if total > 0 else 0
+total=len(filtered_df)
+critical=len(filtered_df[filtered_df['severity']=='Critical'])
+open_incidents=len(filtered_df[filtered_df['status']=='Open'])
+resolved=len(filtered_df[filtered_df['status']=='Resolved'])
+resolution_rate=(resolved / total * 100) if total > 0 else 0
 
-st.info(f"""
-**Overview**: The organization has recorded **{total} security incidents** to date. 
-Currently, **{open_incidents} incidents remain open** requiring attention, while **{resolved} have been resolved** 
-(resolution rate: **{resolution_rate:.1f}%**). Among active incidents, **{critical} are classified as Critical** 
-and require immediate action.
+st.info(f""" **overview**: 
+The organization has reported a total of **{total}** security incidents thus far.
+ At present, there are **{open_incidents}** active incidents requiring action,
+ while **{resolved}** incidents have been resolved (the resolution rate is **{resolution_rate:.1f}** percent).
+Of the active incidents, there are **{critical}** rated critical and needing immediate attention.
+
 """)
+
+
+
 
 st.markdown("---")
 
@@ -74,6 +72,7 @@ st.markdown("### 📈 Key Metrics")
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
+#designing the boxes
     st.markdown("""
     <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                 padding: 20px; border-radius: 10px; text-align: center;'>
@@ -114,40 +113,20 @@ st.markdown("---")
 # Charts Section
 st.markdown("### 📊 Data Visualizations")
 
-# Add chart type selector
-chart_col1, chart_col2 = st.columns(2)
+chart_type=st.radio(
+    "Select Chart Type:",
+    options=["Donut Chart", "Bar Chart", "Pie Chart"],
+    horizontal=True
+)
 
-with chart_col1:
-    chart_type = st.radio(
-        "Select Chart Type:",
-        options=["Donut Chart", "Bar Chart", "Pie Chart"],
-        horizontal=True
-    )
-
-with chart_col2:
-    color_scheme = st.selectbox(
-        "Color Scheme:",
-        options=["Pastel", "Bold", "Dark", "Ocean"],
-        index=0
-    )
-
-# Color schemes
-color_schemes = {
-    "Pastel": px.colors.qualitative.Pastel,
-    "Bold": px.colors.qualitative.Bold,
-    "Dark": px.colors.qualitative.Dark24,
-    "Ocean": px.colors.sequential.Blues
-}
-
-# Status Overview Chart
+#we can give the opprotuinity to  choose to see that tehy wannaa see the data in what type
 status_counts = filtered_df['status'].value_counts()
 
-if chart_type == "Donut Chart":
-    fig_status = px.pie(
+if chart_type=="Donut Chart":
+    fig_status=px.pie(
         values=status_counts.values,
         names=status_counts.index,
         title='Incident Status Distribution',
-        color_discrete_sequence=color_schemes[color_scheme],
         hole=0.4
     )
     fig_status.update_traces(textposition='inside', textinfo='percent+label')
@@ -157,15 +136,13 @@ elif chart_type == "Bar Chart":
         y=status_counts.values,
         title='Incident Status Distribution',
         labels={'x': 'Status', 'y': 'Count'},
-        color=status_counts.index,
-        color_discrete_sequence=color_schemes[color_scheme]
+        color=status_counts.index
     )
 else:  # Pie Chart
-    fig_status = px.pie(
+    fig_status=px.pie(
         values=status_counts.values,
         names=status_counts.index,
-        title='Incident Status Distribution',
-        color_discrete_sequence=color_schemes[color_scheme]
+        title='Incident Status Distribution'
     )
     fig_status.update_traces(textposition='inside', textinfo='percent+label')
 
@@ -174,47 +151,16 @@ st.plotly_chart(fig_status, use_container_width=True)
 st.markdown("---")
 
 # Show incidents with styling
-num_to_show = view_limit if view_limit != 'All' else len(filtered_df)
+num_to_show=view_limit if view_limit != 'All' else len(filtered_df)
 st.markdown(f"### 🔴 Incident Records (Showing {num_to_show if view_limit != 'All' else 'All'})")
 
-# Table display options
-table_col1, table_col2 = st.columns([2, 1])
-
-with table_col1:
-    show_colors = st.checkbox("🎨 Color-code by Severity", value=True)
-
-with table_col2:
-    sort_by = st.selectbox(
-        "Sort by:",
-        options=['incident_id', 'timestamp', 'severity', 'status', 'category'],
-        index=0
-    )
-
-# Add severity color coding
-def highlight_severity(row):
-    if row['severity'] == 'Critical':
-        return ['background-color: #ffcccc'] * len(row)
-    elif row['severity'] == 'High':
-        return ['background-color: #ffe6cc'] * len(row)
-    elif row['severity'] == 'Medium':
-        return ['background-color: #ffffcc'] * len(row)
-    else:
-        return ['background-color: #ccffcc'] * len(row)
-
 # Prepare display dataframe
-display_df = filtered_df.sort_values(by=sort_by, ascending=False)
+display_df = filtered_df
 if view_limit != 'All':
     display_df = display_df.head(view_limit)
 
 # Display table
-if show_colors:
-    st.dataframe(
-        display_df.style.apply(highlight_severity, axis=1),
-        use_container_width=True,
-        height=400
-    )
-else:
-    st.dataframe(display_df, use_container_width=True, height=400)
+st.dataframe(display_df, use_container_width=True, height=400)
 
 # Additional insights
 st.markdown("---")

@@ -5,7 +5,8 @@ import plotly.express as px
 from openai import OpenAI
 import os
 
-# 🔒 Protected Page - Require Login
+# 🔒 Protected Page - Require Login. 
+#we have to make login mandotory for every singla page. 
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
     st.warning("⚠️ Please login first")
     st.info("Go to Home page to login")
@@ -17,12 +18,13 @@ with st.sidebar:
     user_msg = st.text_input("Ask me anything:")
     if st.button("Send") and user_msg:
         with st.spinner("Thinking..."):
-            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-            response = client.chat.completions.create(
+            client=OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            response=client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[{"role": "user", "content": user_msg}]
             )
             st.success(response.choices[0].message.content)
+
 
 import plotly.graph_objects as go
 from app.incidents import get_all_incidents
@@ -57,9 +59,9 @@ col1, col2 = st.columns(2)
 with col1:
     # 1. Severity Distribution (Donut Chart)
     st.markdown("### 🎯 Severity Distribution")
-    severity_counts = incidents_df['severity'].value_counts()
+    severity_counts =incidents_df['severity'].value_counts()
     
-    colors = ['#FF6B6B', '#FFA500', '#FFD700', '#4ECDC4']
+    colors = ['#FF6B6B',"#00EC72","#C41717",'#4ECDC4']
     fig_pie = px.pie(
         values=severity_counts.values, 
         names=severity_counts.index,
@@ -99,8 +101,8 @@ with col2:
     st.plotly_chart(fig_bar, use_container_width=True)
     
     # Category Insights
-    top_category = category_counts.index[0]
-    top_count = category_counts.values[0]
+    top_category=category_counts.index[0]
+    top_count=category_counts.values[0]
     st.info(f"🎯 **Top Threat**: {top_category} with {top_count} incidents ({top_count/total*100:.1f}%)")
 
 st.markdown("---")
@@ -108,8 +110,8 @@ st.markdown("---")
 # Status Comparison
 st.markdown("### 📊 Resolution Performance")
 
-status_counts = incidents_df['status'].value_counts()
-fig_status = go.Figure(data=[
+status_counts=incidents_df['status'].value_counts()
+fig_status=go.Figure(data=[
     go.Bar(
         x=status_counts.index,
         y=status_counts.values,
@@ -131,11 +133,11 @@ fig_status.update_layout(
 st.plotly_chart(fig_status, use_container_width=True)
 
 # Performance Metrics
-resolved = status_counts.get('Resolved', 0)
-open_count = status_counts.get('Open', 0)
-resolution_rate = (resolved / total * 100) if total > 0 else 0
+resolved=status_counts.get('Resolved', 0)
+open_count=status_counts.get('Open', 0)
+resolution_rate=(resolved / total * 100) if total > 0 else 0
 
-col1, col2, col3 = st.columns(3)
+col1,col2,col3 = st.columns(3)
 with col1:
     st.metric("Resolution Rate", f"{resolution_rate:.1f}%", delta="Target: 70%")
 with col2:
@@ -143,6 +145,36 @@ with col2:
 with col3:
     avg_per_category = total / category_count if category_count > 0 else 0
     st.metric("Avg per Category", f"{avg_per_category:.1f}")
+
+st.markdown("---")
+
+# Timeline Chart
+st.markdown("### 📅 Incident Timeline")
+
+# Convert timestamp to datetime if needed
+incidents_df['timestamp'] = pd.to_datetime(incidents_df['timestamp'])
+incidents_df['date'] = incidents_df['timestamp'].dt.date
+
+# Count incidents per day
+timeline_data = incidents_df.groupby('date').size().reset_index(name='count')
+
+fig_timeline = px.line(
+    timeline_data,
+    x='date',
+    y='count',
+    title='Incidents Over Time',
+    labels={'date': 'Date', 'count': 'Number of Incidents'},
+    markers=True
+)
+fig_timeline.update_traces(
+    line=dict(color='#667eea', width=3),
+    marker=dict(size=8, color='#764ba2')
+)
+fig_timeline.update_layout(
+    hovermode='x unified',
+    height=400
+)
+st.plotly_chart(fig_timeline, use_container_width=True)
 
 st.markdown("---")
 
