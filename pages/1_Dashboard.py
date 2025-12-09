@@ -2,20 +2,21 @@ import streamlit as st
 from openai import OpenAI
 import os
 
-# 🔒 Protected Page - Require Login
+#WE HAVE TO MAKE LOHIN MANDOTORY.
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
     st.warning("⚠️ Please login first")
     st.info("Go to Home page to login")
     st.stop()
 
-# AI Chatbot Sidebar
+# AI Chatbot Sidebar.
+# WE HAVE THE SAME CODE FOR ALL OF THE PAGES.
 with st.sidebar:
     st.subheader("🤖 AI Assistant")
-    user_msg = st.text_input("Ask me anything:")
+    user_msg = st.text_input("Hi dear, I am your AI assistant.Ask me whatever you want")
     if st.button("Send") and user_msg:
         with st.spinner("Thinking..."):
-            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-            response = client.chat.completions.create(
+            client=OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            response=client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[{"role": "user", "content": user_msg}]
             )
@@ -29,42 +30,7 @@ from app.incidents import get_all_incidents
 # Page Config
 st.title("📊 Cyber Security Dashboard")
 
-# Dashboard Customization Controls
-st.markdown("### ⚙️ Customize Your Dashboard")
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    severity_filter = st.multiselect(
-        "🎯 Filter by Severity",
-        options=['Critical', 'High', 'Medium', 'Low'],
-        default=['Critical', 'High', 'Medium', 'Low'],
-        help="Select severity levels to display"
-    )
-
-with col2:
-    status_filter = st.multiselect(
-        "📊 Filter by Status",
-        options=['Open', 'In Progress', 'Resolved'],
-        default=['Open', 'In Progress', 'Resolved'],
-        help="Select incident status to display"
-    )
-
-with col3:
-    category_filter = st.multiselect(
-        "📦 Filter by Category",
-        options=['Malware', 'Phishing', 'Data Breach', 'DDoS', 'Unauthorized Access', 'Ransomware'],
-        default=['Malware', 'Phishing', 'Data Breach', 'DDoS', 'Unauthorized Access', 'Ransomware'],
-        help="Select attack categories"
-    )
-
-with col4:
-    view_limit = st.selectbox(
-        "👁️ Show Records",
-        options=[10, 25, 50, 100, 'All'],
-        index=0,
-        help="Number of incidents to display"
-    )
-
+st.markdown("🔍 Incident Records Overview")
 st.markdown("---")
 
 # Load real data
