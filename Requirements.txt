@@ -1,2 +1,7 @@
+streamlit
 pandas
+plotly
 bcrypt==4.2.0
+openai
+python-dotenv
+Pillow
