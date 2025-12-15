@@ -42,7 +42,7 @@ view_limit=st.selectbox(
 
 st.markdown("---")
 
-# Load real data
+# Load real data from incidents module
 incidents_df=get_all_incidents()
 filtered_df=incidents_df.copy()
 
