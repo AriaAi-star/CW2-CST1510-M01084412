@@ -97,7 +97,7 @@ def load_users():
         with open(USER_FILE, 'r') as f:
             for line in f:
                 line = line.strip()
-                if ',' in line:
+                if line and ',' in line:  # Check if line is not empty
                     username, password_hash=line.split(',', 1)
                     users[username]=password_hash
     return users
