@@ -227,9 +227,9 @@ if not st.session_state.logged_in:
                     
                     # If all validations pass
                     if not errors:
-                        hashed = hash_password(new_pass)
-                        st.session_state.users[new_user] = hashed
                         save_user(new_user, new_pass)
+                        # Reload users from file to sync session state
+                        st.session_state.users = load_users()
                         st.success("🎉 Registration successful! Password is secure and hashed. Please login.")
                     else:
                         for error in errors:
